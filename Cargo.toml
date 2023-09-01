@@ -1,0 +1,33 @@
+[package]
+name = "iltcme"
+version = "0.1.0"
+edition = "2021"
+authors = [
+    "Thomas Versteeg <t.versteeg@cemsbv.io>"
+]
+description = "Inverse Laplace transform with concentrated matrix-exponential functions"
+keywords = ["laplace", "inverse-laplace"]
+categories = [
+    "mathematics",
+]
+homepage = "https://inverselaplace.org"
+repository = "https://github.com/cemsbv/iltcme"
+documentation = "https://docs.rs/iltcme/"
+license = "MPL-2.0"
+readme = "README.md"
+
+[dependencies]
+nalgebra = "0.32.3"
+
+[build-dependencies]
+serde = { version = "1.0.188", features = ["derive"] }
+serde_json = "1.0.105"
+
+[dev-dependencies]
+approx = "0.5.1"
+
+# Enable LaTeX in Rust documentation
+[package.metadata.docs.rs]
+# To build locally use
+#   RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps --open
+rustdoc-args = ["--html-in-header", "katex-header.html"]
