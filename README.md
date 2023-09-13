@@ -26,6 +26,14 @@ fn main() {
 }
 ```
 
+# Feature Flags
+
+### `"precomputed"`
+
+Setting the `"precomputed"` feature flag will calculate a lot more during
+compile time, improving runtime performance. The downside is that it increases
+compilation times and resulting binary sizes.
+
 # Implementation details
 
 This crate parses a large list of precomputed parameters from a JSON file and

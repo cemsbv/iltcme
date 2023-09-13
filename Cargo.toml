@@ -16,6 +16,11 @@ documentation = "https://docs.rs/iltcme/"
 license = "MPL-2.0"
 readme = "README.md"
 
+[features]
+default = []
+# Calculate as much as possible in the build step, this is very slow and creates large binaries but results in very efficient calculations
+precomputed = []
+
 [dependencies]
 nalgebra = "0.32.3"
 
