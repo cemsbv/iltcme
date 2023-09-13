@@ -12,16 +12,6 @@ enum ValOrArray {
     Vec(Vec<f64>),
 }
 
-fn fmt_vec(v: &[(Complex<f64>, f64)]) -> String {
-    format!(
-        "[{}]",
-        v.iter()
-            .map(|(v1, v2)| format!("(C{{re:{}f64,im:{}f64}},{}f64)", v1.re, v1.im, v2))
-            .collect::<Vec<String>>()
-            .join(",")
-    )
-}
-
 #[derive(Debug, Deserialize)]
 struct Param {
     pub n: usize,
@@ -49,12 +39,12 @@ fn main() {
     // Create the array string
     let mut s = String::new();
     let mut consts = String::new();
-    // Import complex numbers from nalgebra
-    s += "use nalgebra::Complex as C;\n";
     // Re-export the maximum function evaluations
     s += &format!("const MAX_EVALUATIONS: usize = {max_evaluations};\n");
     // Create a lookup list for each iteration
-    s += &format!("const ETA_BETA_PAIRS: [(f64, &'static [(C<f64>, f64)]); {max_evaluations}] = [");
+    s += &format!(
+        "const ETA_BETA_PAIRS: [(f64, &'static [(f64, f64, f64)], f64, f64); {max_evaluations}] = ["
+    );
 
     // Calculate the etas and betas for each maximum of function evaluations
     (0..max_evaluations).for_each(|index| {
@@ -66,23 +56,25 @@ fn main() {
             }
         }
 
-        let eta = std::iter::once((steepest.c * steepest.mu1).into()).chain(
-            steepest
-                .a
-                .iter()
-                .zip(steepest.b.iter())
-                .map(|(a, b)| Complex::new(steepest.mu1 * a, steepest.mu1 * b)),
-        );
-        let beta = std::iter::once(steepest.mu1.into())
-            .chain((0..steepest.n).map(|i| steepest.mu1 * (i as f64 + 1.0) * steepest.omega));
+        let eta = steepest
+            .a
+            .iter()
+            .zip(steepest.b.iter())
+            .map(|(a, b)| (steepest.mu1 * a, steepest.mu1 * b));
+        let beta = (0..steepest.n).map(|i| steepest.mu1 * (i as f64 + 1.0) * steepest.omega);
 
         let eta_betas = eta.zip(beta).collect::<Vec<_>>();
         consts += &format!(
-            "const ETA_BETA_PAIRS_{index}: [(C<f64>, f64); {}] = {};\n",
+            "const ETA_BETA_PAIRS_{index}: [(f64, f64, f64); {}] = {};\n",
             eta_betas.len(),
             fmt_vec(&eta_betas)
         );
-        s += &format!("({},&ETA_BETA_PAIRS_{index}),", steepest.mu1);
+        s += &format!(
+            "({},&ETA_BETA_PAIRS_{index},{}f64,{}f64),",
+            steepest.mu1,
+            steepest.c * steepest.mu1,
+            steepest.mu1
+        );
     });
 
     s += "];";
@@ -91,4 +83,15 @@ fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("cme_values.rs");
     std::fs::write(dest_path, format!("{consts}\n{s}")).unwrap();
+}
+
+
+fn fmt_vec(v: &[((f64, f64), f64)]) -> String {
+    format!(
+        "[{}]",
+        v.iter()
+            .map(|((v1, v2), v3)| format!("({}f64,{}f64,{}f64)", v1, v2, v3))
+            .collect::<Vec<String>>()
+            .join(",")
+    )
 }

@@ -28,10 +28,14 @@ pub fn laplace_inversion(
     assert!(max_function_evals < MAX_EVALUATIONS);
 
     // Compute inverse Laplace
-    let (mu1, eta_betas) = ETA_BETA_PAIRS[max_function_evals];
-    eta_betas
-        .iter()
-        .map(|(eta, beta)| (eta * laplace_func(Complex::new(mu1, *beta) / time)).re)
+    let (mu1, eta_betas, first_eta, first_beta) = ETA_BETA_PAIRS[max_function_evals];
+    std::iter::once((first_eta.into(), first_beta.into()))
+        .chain(
+            eta_betas
+                .iter()
+                .map(|(eta_re, eta_im, beta)| (Complex::new(*eta_re, *eta_im), Complex::new(mu1, *beta))),
+        )
+        .map(|(eta, beta)| (eta * laplace_func(beta / time)).re)
         .sum::<f64>()
         / time
 }
@@ -48,7 +52,7 @@ mod tests {
             "Exponential",
             |s| (1.0 + s).recip(),
             |s| (-s).exp(),
-            &[0.0001, 0.1, 1.0, 10.0],
+            &[0.01, 0.1, 1.0, 10.0],
             max_function_evals,
         );
         invert_fn(

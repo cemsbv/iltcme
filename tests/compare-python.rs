@@ -50,7 +50,7 @@ fn run_python(lt_func: &str, test_values: &[f64], max_fn_evals: usize) -> Vec<f6
         py_fun
             .call1((
                 lt_func,
-                //PyList::new(py, test_values.iter()),
+                PyList::new(py, test_values.iter()),
                 max_fn_evals,
                 include_str!("../src/iltcme.json"),
             ))
