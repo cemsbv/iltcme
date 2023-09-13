@@ -74,6 +74,10 @@ jobs:
       # Checkout the branch being tested
       - uses: actions/checkout@v3
 
+      # Install python with numpy
+      - uses: actions/setup-python@v4
+      - run: python -m pip install --upgrade pip && pip install numpy
+
       # Install rust stable
       - uses: dtolnay/rust-toolchain@master
         with:
