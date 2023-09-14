@@ -9,13 +9,6 @@ mod generate {
     use serde::Deserialize;
 
     #[derive(Debug, Deserialize)]
-    #[serde(untagged)]
-    enum ValOrArray {
-        Val(f64),
-        Vec(Vec<f64>),
-    }
-
-    #[derive(Debug, Deserialize)]
     struct Param {
         pub n: usize,
         pub a: Vec<f64>,
@@ -99,45 +92,30 @@ mod generate {
 /// Only convert the ILTCME values to Rust.
 #[cfg(not(feature = "precomputed"))]
 mod generate {
-    use std::{fmt::Display, path::Path};
+    use std::{
+        fs::File,
+        io::{BufWriter, Write},
+        path::Path,
+    };
 
     use serde::Deserialize;
+    use serde_json::value::RawValue;
 
     #[derive(Debug, Deserialize)]
-    #[serde(untagged)]
-    enum ValOrArray {
-        Val(f64),
-        Vec(Vec<f64>),
-    }
-
-    impl Display for ValOrArray {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            match self {
-                ValOrArray::Val(v) => f.write_str(&format!("[{v}]")),
-                ValOrArray::Vec(v) => f.write_str(&fmt_vec(v)),
-            }
-        }
-    }
-
-    fn fmt_vec(v: &[f64]) -> String {
-        format!(
-            "[{}]",
-            v.iter()
-                .map(|v| format!("{v}"))
-                .collect::<Vec<String>>()
-                .join(",")
-        )
-    }
-
-    #[derive(Debug, Deserialize)]
-    struct Param {
+    struct Param<'a> {
         pub n: usize,
-        pub a: Vec<f64>,
-        pub b: Vec<f64>,
-        pub c: f64,
-        pub omega: f64,
-        pub mu1: f64,
-        pub cv2: f64,
+        #[serde(borrow)]
+        pub a: Vec<&'a RawValue>,
+        #[serde(borrow)]
+        pub b: Vec<&'a RawValue>,
+        #[serde(borrow)]
+        pub c: &'a RawValue,
+        #[serde(borrow)]
+        pub omega: &'a RawValue,
+        #[serde(borrow)]
+        pub mu1: &'a RawValue,
+        #[serde(borrow)]
+        pub cv2: &'a RawValue,
     }
 
     pub fn generate() {
@@ -147,24 +125,36 @@ mod generate {
         // Read the json file
         let params: Vec<Param> = serde_json::from_str(include_str!("src/iltcme.json")).unwrap();
 
-        // Create the array string
-        let mut s = String::new();
-        let mut consts = String::new();
-        s += &format!("const CME_PARAMS: [CmeParam; {}] = [", params.len());
-
-        s += &params.into_iter().enumerate().map(| (i, Param { n, a, b, c, omega,  mu1, cv2 })| {
-        consts += &format!("const A_{i}: [f64; {}] = {};\n", a.len(), fmt_vec(&a));
-        consts += &format!("const B_{i}: [f64; {}] = {};\n", b.len(), fmt_vec(&b));
-
-        format!("CmeParam {{ n: {n}, a: &A_{i}, b: &B_{i}, c: {c}, omega: {omega}, mu1: {mu1}, cv2: {cv2} }}")
-    }).collect::<Vec<String>>().join(",\n");
-
-        s += "];";
-
         // Write the params to a file
         let out_dir = std::env::var("OUT_DIR").unwrap();
         let dest_path = Path::new(&out_dir).join("cme_values.rs");
-        std::fs::write(dest_path, format!("{consts}\n{s}")).unwrap();
+        let file = File::create(dest_path).unwrap();
+        let mut s = BufWriter::new(file);
+
+        // Create the data arrays
+        params
+            .iter()
+            .enumerate()
+            .for_each(|(i, Param { a, b, .. })| {
+                write!(s, "const A_{i}: [f64; {}] = ", a.len()).unwrap();
+                write_vec(&mut s, &a);
+                write!(s, ";\nconst B_{i}: [f64; {}] = ", b.len()).unwrap();
+                write_vec(&mut s, &b);
+                writeln!(s, ";").unwrap();
+            });
+
+        // Create the parameters
+        write!(s, "const CME_PARAMS: [CmeParam; {}] = [", params.len()).unwrap();
+        params.into_iter().enumerate().for_each(| (i, Param { n, c, omega,  mu1, cv2, .. })| {
+            writeln!(s, "CmeParam {{ n: {n}, a: &A_{i}, b: &B_{i}, c: {c}, omega: {omega}, mu1: {mu1}, cv2: {cv2} }},").unwrap();
+        });
+        writeln!(s, "];").unwrap();
+    }
+
+    fn write_vec(s: &mut impl Write, v: &[&RawValue]) {
+        write!(s, "[").unwrap();
+        v.iter().for_each(|v| write!(s, "{v},").unwrap());
+        write!(s, "]").unwrap();
     }
 }
 
