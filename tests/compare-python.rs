@@ -123,7 +123,7 @@ fn run_python(lt_func: &str, test_values: &[f64], max_fn_evals: usize) -> Vec<f6
                 lt_func,
                 PyList::new(py, test_values.iter()),
                 max_fn_evals,
-                include_str!("../src/iltcme.json"),
+                include_str!("../iltcme.json"),
             ))
             .map_err(|e| e.print_and_set_sys_last_vars(py))
             .unwrap()

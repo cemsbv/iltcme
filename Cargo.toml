@@ -16,21 +16,8 @@ documentation = "https://docs.rs/iltcme/"
 license = "MPL-2.0"
 readme = "README.md"
 
-[features]
-default = []
-# Calculate as much as possible in the build step.
-#
-# This is very slow and creates large binaries but results in very efficient calculations.
-# It also comes at a slight numerical cost since the JSON numbers need to be parsed and the 'serde_json' crate used for parsing doesn't use the full numerical accuracy needed.
-precomputed = []
-
 [dependencies]
 nalgebra = "0.32.3"
-
-[build-dependencies]
-nalgebra = "0.32.3"
-serde = { version = "1.0.188", features = ["derive"] }
-serde_json = { version = "1.0.105", features = ["raw_value"] }
 
 [dev-dependencies]
 approx = "0.5.1"
@@ -41,3 +28,6 @@ pyo3 = { version = "0.19.2", features = ["auto-initialize"] }
 # To build locally use
 #   RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps --open
 rustdoc-args = ["--html-in-header", "katex-header.html"]
+
+[workspace]
+members = ["gen-coefficients"]

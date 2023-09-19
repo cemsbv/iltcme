@@ -26,16 +26,16 @@ fn main() {
 }
 ```
 
-# Feature Flags
-
-### `"precomputed"`
-
-Setting the `"precomputed"` feature flag will calculate a lot more during
-compile time, improving runtime performance. The downside is that it increases
-compilation times and resulting binary sizes.
-
 # Implementation details
 
 This crate parses a large list of precomputed parameters from a JSON file and
 converts them to a Rust file which is internally used. The effect of this is
 that the build time might be slow, no runtime penalty should be paid though.
+
+# Generate manually
+
+To regenerate the Rust coefficient files run the following commands in the root:
+
+```sh
+cargo run -p gen-coefficients -- --input iltcme.json --output src/coefficients.rs
+```
