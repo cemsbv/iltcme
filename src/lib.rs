@@ -9,6 +9,8 @@ use nalgebra::Complex;
 ///
 /// Evaluates the Laplace transform expression at certain points to approximate the inverse of the Laplace transform at a given point.
 ///
+/// Maximum number of evaluations is 500 due to filesize limitations for crates.
+///
 /// # Example
 ///
 /// ```rust
@@ -21,10 +23,14 @@ use nalgebra::Complex;
 /// ```
 pub fn laplace_inversion(
     laplace_func: impl Fn(Complex<f64>) -> Complex<f64>,
-    time: f64,
+    s: f64,
     max_function_evals: usize,
 ) -> f64 {
-    assert!(max_function_evals < coefficients::MAX_EVALUATIONS);
+    assert!(
+        max_function_evals <= coefficients::MAX_EVALUATIONS,
+        "Laplace maximum function evaluations must be less or equal to {}",
+        coefficients::MAX_EVALUATIONS
+    );
 
     // Compute inverse Laplace
     let (mu1, eta_betas, first_eta) = coefficients::ETA_BETA_PAIRS[max_function_evals];
@@ -32,9 +38,9 @@ pub fn laplace_inversion(
         .chain(eta_betas.iter().map(|(eta_re, eta_im, beta)| {
             (Complex::new(*eta_re, *eta_im), Complex::new(mu1, *beta))
         }))
-        .map(|(eta, beta)| (eta * laplace_func(beta / time)).re)
+        .map(|(eta, beta)| (eta * laplace_func(beta / s)).re)
         .sum::<f64>()
-        / time
+        / s
 }
 
 #[cfg(test)]

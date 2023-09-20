@@ -14,7 +14,7 @@ const TEST_VALUES: [f64; 13] = [
 
 #[test]
 fn exponential() {
-    for max_fn_evals in 1..1000 {
+    for max_fn_evals in 1..500 {
         compare_values(
             &TEST_VALUES,
             |x| (-x).exp(),
@@ -27,7 +27,7 @@ fn exponential() {
 
 #[test]
 fn sine() {
-    for max_fn_evals in 1..1000 {
+    for max_fn_evals in 1..500 {
         compare_values(
             &TEST_VALUES,
             |x| x.sin(),
@@ -40,7 +40,7 @@ fn sine() {
 
 #[test]
 fn squarewave() {
-    for max_fn_evals in 1..1000 {
+    for max_fn_evals in 1..500 {
         compare_values(
             &[1.0, 2.0, 2.5, 3.0, 4.1, 5.01],
             |x| x.floor() % 2.0,
@@ -53,7 +53,7 @@ fn squarewave() {
 
 #[test]
 fn staircase() {
-    for max_fn_evals in 1..1000 {
+    for max_fn_evals in 1..500 {
         compare_values(
             &[1.0, 2.0, 2.5, 3.0, 4.1, 5.01],
             |x| x.floor(),
@@ -87,7 +87,7 @@ fn compare_values(
             // Ensure that our Rust value is closer or equal to the Python solution
             let python_dist = (real - python).abs();
             let rust_dist = (real - rust).abs();
-            assert!(rust_dist <= python_dist + ALLOWED_ERROR, "Rust result is worse than original Python result:\n\tPython Delta: {python_dist}\n\tRust Delta  : {rust_dist}\n\tPython      : {python}\n\tRust        : {rust}\n\tExpected    : {real}\n\tFn evals    : {max_fn_evals}");
+            assert!(rust_dist <= python_dist + ALLOWED_ERROR, "Rust result is worse than original Python result:\n\tPython Delta: {python_dist}\n\tRust Delta  : {rust_dist}\n\tPython      : {python}\n\tRust        : {rust}\n\tExpected    : {real}\n\tFn evals    : {max_fn_evals}\n\tX           : {x}");
         })
 }
 

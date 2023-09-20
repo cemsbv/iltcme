@@ -21,7 +21,7 @@ struct Args {
     #[arg(short, long)]
     pub output: PathBuf,
     /// Max evaluations to calculate.
-    #[arg(short, long, default_value_t = 1000)]
+    #[arg(short, long, default_value_t = 500)]
     pub max_evaluations: usize,
     /// Export the raw coefficients instead of precalculated values.
     #[arg(short, long)]
@@ -72,7 +72,7 @@ where
     .unwrap();
     // Create a lookup list for each iteration
     write!(out,
-            "pub(crate) const ETA_BETA_PAIRS: [(f64, &'static [(f64, f64, f64)], f64); {max_evaluations}] = ["
+            "pub(crate) const ETA_BETA_PAIRS: [(f64, &[(f64, f64, f64)], f64); {max_evaluations}] = ["
         )
         .unwrap();
 
@@ -92,18 +92,18 @@ where
             .iter()
             .zip(steepest.b.iter())
             .map(|(a, b)| (steepest.mu1 * a, steepest.mu1 * b));
-        let beta = (0..steepest.n).map(|i| steepest.mu1 * (i as f64 + 1.0) * steepest.omega);
+        let beta = (0..steepest.n).map(|i| ((i + 1) as f64) * steepest.omega * steepest.mu1);
 
         let eta_betas = eta.zip(beta).collect::<Vec<_>>();
         consts += &format!(
-            "const E_{index}: [(f64, f64, f64); {}] = {};\n",
+            "const E{index:X}:[(f64,f64,f64);{}]={};\n",
             eta_betas.len(),
             fmt_vec(&eta_betas)
         );
         write!(
             out,
-            "({},&E_{index},{}),",
-            steepest.mu1,
+            "({},&E{index:X},{}),",
+            fmt_f64(steepest.mu1),
             fmt_f64(steepest.c * steepest.mu1),
         )
         .unwrap();
@@ -116,7 +116,12 @@ fn fmt_vec(v: &[((f64, f64), f64)]) -> String {
     format!(
         "[{}]",
         v.iter()
-            .map(|((v1, v2), v3)| format!("({},{},{})", fmt_f64(*v1), fmt_f64(*v2), fmt_f64(*v3)))
+            .map(|((v1, v2), v3)| format!(
+                "({},{},{})",
+                fmt_f64(*v1),
+                fmt_f64(*v2),
+                fmt_f64(*v3)
+            ))
             .collect::<Vec<String>>()
             .join(",")
     )
@@ -126,7 +131,7 @@ fn fmt_vec(v: &[((f64, f64), f64)]) -> String {
 fn fmt_f64(v: f64) -> String {
     if v.fract() == 0.0 {
         // Always print as a float
-        format!("{v}.0")
+        format!("{v}.")
     } else {
         format!("{v}")
     }
