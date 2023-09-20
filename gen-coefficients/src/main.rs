@@ -71,10 +71,11 @@ where
     )
     .unwrap();
     // Create a lookup list for each iteration
-    write!(out,
-            "pub(crate) const ETA_BETA_PAIRS: [(f64, &[(f64, f64, f64)], f64); {max_evaluations}] = ["
-        )
-        .unwrap();
+    write!(
+        out,
+        "pub(crate) const ETA_BETA_PAIRS: [(f64, &[(f64, f64, f64)], f64); {max_evaluations}] = ["
+    )
+    .unwrap();
 
     // Calculate the etas and betas for each maximum of function evaluations
     let mut consts = String::new();
@@ -116,12 +117,7 @@ fn fmt_vec(v: &[((f64, f64), f64)]) -> String {
     format!(
         "[{}]",
         v.iter()
-            .map(|((v1, v2), v3)| format!(
-                "({},{},{})",
-                fmt_f64(*v1),
-                fmt_f64(*v2),
-                fmt_f64(*v3)
-            ))
+            .map(|((v1, v2), v3)| format!("({},{},{})", fmt_f64(*v1), fmt_f64(*v2), fmt_f64(*v3)))
             .collect::<Vec<String>>()
             .join(",")
     )
