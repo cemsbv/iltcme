@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2024-01-31
+
+### Features
+
+- Add `laplace_inversion_mut` which accepts a `FnMut` closure
+
 ## [0.2.1] - 2024-01-29
 
 ### Miscellaneous Tasks
