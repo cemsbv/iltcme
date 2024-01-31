@@ -43,6 +43,33 @@ pub fn laplace_inversion(
         / s
 }
 
+/// Calculate the Laplace inversion for a mutable function using the CME method.
+///
+/// Evaluates the Laplace transform expression at certain points to approximate the inverse of the Laplace transform at a given point.
+///
+/// Maximum number of evaluations is 500 due to filesize limitations for crates.
+pub fn laplace_inversion_mut(
+    mut laplace_func: impl FnMut(Complex<f64>) -> Complex<f64>,
+    s: f64,
+    max_function_evals: usize,
+) -> f64 {
+    assert!(
+        max_function_evals <= coefficients::MAX_EVALUATIONS,
+        "Laplace maximum function evaluations must be less or equal to {}",
+        coefficients::MAX_EVALUATIONS
+    );
+
+    // Compute inverse Laplace
+    let (mu1, eta_betas, first_eta) = coefficients::ETA_BETA_PAIRS[max_function_evals];
+    std::iter::once((first_eta.into(), mu1.into()))
+        .chain(eta_betas.iter().map(|(eta_re, eta_im, beta)| {
+            (Complex::new(*eta_re, *eta_im), Complex::new(mu1, *beta))
+        }))
+        .map(|(eta, beta)| (eta * laplace_func(beta / s)).re)
+        .sum::<f64>()
+        / s
+}
+
 #[cfg(test)]
 mod tests {
     use nalgebra::{Complex, ComplexField};
