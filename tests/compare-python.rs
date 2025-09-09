@@ -1,6 +1,6 @@
 use nalgebra::{Complex, ComplexField};
 use pyo3::{
-    types::{PyList, PyModule},
+    types::{PyAnyMethods as _, PyList, PyModule},
     Python,
 };
 
@@ -103,13 +103,18 @@ fn run_rust(
 }
 
 fn run_python(lt_func: &str, test_values: &[f64], max_fn_evals: usize) -> Vec<f64> {
-    pyo3::prepare_freethreaded_python();
+    Python::initialize();
 
-    Python::with_gil(|py| {
+    Python::attach(|py| {
         // Load 'tests/iltcme.py'
-        let py_mod = PyModule::from_code(py, include_str!("./iltcme.py"), "iltcme.py", "iltcme")
-            .map_err(|e| e.print_and_set_sys_last_vars(py))
-            .unwrap();
+        let py_mod = PyModule::from_code(
+            py,
+            pyo3::ffi::c_str!(include_str!("./iltcme.py")),
+            pyo3::ffi::c_str!("iltcme.py"),
+            pyo3::ffi::c_str!("iltcme"),
+        )
+        .map_err(|e| e.print_and_set_sys_last_vars(py))
+        .unwrap();
 
         // Get the 'ilt' function from the 'iltcme' module
         let py_fun = py_mod
@@ -121,7 +126,7 @@ fn run_python(lt_func: &str, test_values: &[f64], max_fn_evals: usize) -> Vec<f6
         py_fun
             .call1((
                 lt_func,
-                PyList::new(py, test_values.iter()),
+                PyList::new(py, test_values.iter()).unwrap(),
                 max_fn_evals,
                 include_str!("../iltcme.json"),
             ))
