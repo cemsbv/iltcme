@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2025-09-09
+
+### Bug Fixes
+
+- *(deps)* Update all dependencies
+- *(deps)* Update all non-major dependencies
+- *(deps)* Update all non-major dependencies
+
+### Miscellaneous Tasks
+
+- *(ci)* Move from dependabot to renovate
+
 ## [0.2.2] - 2024-01-31
 
 ### Features
