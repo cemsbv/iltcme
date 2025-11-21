@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-11-21
+
+### Performance
+
+- *(clippy)* Properly ignore clippy lints with generated coefficient file
+
+### Refactor
+
+- *(complex)* [**breaking**] Replace heavy `nalgebra` crate with `num-complex` for the `Complex<f64>` type
+
 ## [0.2.3] - 2025-09-09
 
 ### Bug Fixes

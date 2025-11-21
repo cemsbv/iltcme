@@ -1,6 +1,6 @@
 [package]
 name = "iltcme"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2021"
 authors = ["Thomas Versteeg <t.versteeg@cemsbv.io>"]
 description = "Inverse Laplace transform with concentrated matrix-exponential functions"
