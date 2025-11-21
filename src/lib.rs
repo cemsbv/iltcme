@@ -3,7 +3,7 @@
 #[rustfmt::skip]
 mod coefficients;
 
-use nalgebra::Complex;
+use num_complex::Complex;
 
 /// Calculate the Laplace inversion for a function using the CME method.
 ///
@@ -72,7 +72,7 @@ pub fn laplace_inversion_mut(
 
 #[cfg(test)]
 mod tests {
-    use nalgebra::{Complex, ComplexField};
+    use num_complex::{Complex, ComplexFloat as _};
 
     use super::*;
 

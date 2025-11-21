@@ -1,7 +1,7 @@
-use nalgebra::{Complex, ComplexField};
+use num_complex::{Complex, ComplexFloat as _};
 use pyo3::{
     types::{PyAnyMethods as _, PyList, PyModule},
-    Python,
+    PyErr, Python,
 };
 
 /// How much worse the Rust is allowed to be compared to the Python result.
@@ -113,7 +113,7 @@ fn run_python(lt_func: &str, test_values: &[f64], max_fn_evals: usize) -> Vec<f6
             pyo3::ffi::c_str!("iltcme.py"),
             pyo3::ffi::c_str!("iltcme"),
         )
-        .map_err(|e| e.print_and_set_sys_last_vars(py))
+        .map_err(|e: PyErr| e.print_and_set_sys_last_vars(py))
         .unwrap();
 
         // Get the 'ilt' function from the 'iltcme' module
@@ -130,10 +130,10 @@ fn run_python(lt_func: &str, test_values: &[f64], max_fn_evals: usize) -> Vec<f6
                 max_fn_evals,
                 include_str!("../iltcme.json"),
             ))
-            .map_err(|e| e.print_and_set_sys_last_vars(py))
+            .map_err(|e: PyErr| e.print_and_set_sys_last_vars(py))
             .unwrap()
             .extract()
-            .map_err(|e| e.print_and_set_sys_last_vars(py))
+            .map_err(|e: PyErr| e.print_and_set_sys_last_vars(py))
             .unwrap()
     })
 }

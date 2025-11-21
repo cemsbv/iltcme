@@ -4,6 +4,6 @@ version = "0.2.3"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.5.47", features = ["derive"] }
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = { version = "1.0.143", features = ["raw_value"] }
+clap = { version = "4.5.53", features = ["derive"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = { version = "1.0.145", features = ["raw_value"] }

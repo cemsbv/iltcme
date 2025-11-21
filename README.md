@@ -20,10 +20,9 @@ evaluations.
 The Laplace transform of sine is $h^*(s) = 1 / (s^2 + 1)$.
 
 ```rust
-fn main() {
-  let result = iltcme::laplace_inversion(|s| 1.0 / (s.powi(2) + 1.0), 1.0, 50);
-  approx::relative_eq!(result, 1.0_f64.sin(), epsilon = 0.001);
-}
+let result = iltcme::laplace_inversion(|s| 1.0 / (s.powi(2) + 1.0), 1.0, 50);
+
+approx::relative_eq!(result, 1.0_f64.sin(), epsilon = 0.001);
 ```
 
 # Implementation details

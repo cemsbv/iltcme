@@ -2,14 +2,10 @@
 name = "iltcme"
 version = "0.2.3"
 edition = "2021"
-authors = [
-    "Thomas Versteeg <t.versteeg@cemsbv.io>"
-]
+authors = ["Thomas Versteeg <t.versteeg@cemsbv.io>"]
 description = "Inverse Laplace transform with concentrated matrix-exponential functions"
 keywords = ["laplace", "inverse-laplace"]
-categories = [
-    "mathematics",
-]
+categories = ["mathematics"]
 homepage = "https://inverselaplace.org"
 repository = "https://github.com/cemsbv/iltcme"
 documentation = "https://docs.rs/iltcme/"
@@ -17,11 +13,11 @@ license = "MPL-2.0"
 readme = "README.md"
 
 [dependencies]
-nalgebra = "0.34.0"
+num-complex = "0.4.6"
 
 [dev-dependencies]
 approx = "0.5.1"
-pyo3 = { version = "0.26.0", features = ["auto-initialize"] }
+pyo3 = { version = "0.27.1", features = ["auto-initialize"] }
 
 # Enable LaTeX in Rust documentation
 [package.metadata.docs.rs]
