@@ -180,7 +180,7 @@ fn main() {
 
     writeln!(out, "//! Auto-generated coefficient file, don't edit.\n").unwrap();
     writeln!(out, "#![cfg_attr(rustfmt, rustfmt_skip)]").unwrap();
-    writeln!(out, "#[allow(clippy::all)]").unwrap();
+    writeln!(out, "#![allow(clippy::all)]").unwrap();
 
     let json = std::fs::read_to_string(args.input).unwrap();
     if args.raw {
